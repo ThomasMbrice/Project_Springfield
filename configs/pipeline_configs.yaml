@@ -1,0 +1,27 @@
+# pipleine config 09/25
+video_processing:
+  fps: 30
+  resize_height: 720
+  resize_width: 1280
+  skip_frames: 0  # process every frame - change iff too long
+  
+court:
+  court_length: 94  # ft
+  court_width: 50   # ft
+  three_point_distance: 23.75  # ft
+  
+statistics:
+  shot_detection:
+    min_ball_height: 8  # ft
+    max_shot_distance: 35  # ft
+    arc_threshold: 0.7
+    
+  movement_tracking:
+    smoothing_window: 5
+    speed_calculation_window: 10
+    
+output:
+  save_video: true
+  save_stats: true
+  output_format: "json"  # or "csv" change on video typpe
+  video_codec: "mp4v"

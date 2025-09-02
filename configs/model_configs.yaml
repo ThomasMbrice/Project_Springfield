@@ -1,0 +1,29 @@
+# model config 09/25
+models:
+  player_detection:
+    name: "yolov8n"
+    confidence_threshold: 0.5
+    iou_threshold: 0.4
+    device: "cuda"  # or "cpu" CHANGE BASED ON APPL?
+    input_size: [640, 640]
+    
+  ball_detection:
+    name: "yolov8s"
+    confidence_threshold: 0.3
+    iou_threshold: 0.5
+    device: "cuda"
+    input_size: [640, 640]
+    
+  court_detection:
+    model_path: "models/court_detector.pt"
+    confidence_threshold: 0.7
+    
+tracking:
+  max_disappeared: 30
+  max_distance: 50
+  tracker_type: "deepsort"  # or "bytetrack"
+  
+pose_estimation:
+  model_name: "mediapipe"
+  min_detection_confidence: 0.5
+  min_tracking_confidence: 0.5
