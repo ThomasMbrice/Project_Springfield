@@ -43,6 +43,7 @@ basketball-analytics/
 │   ├── annotations/              # Ground truth labels
 │   └── models/                   # Trained model checkpoints
 ├── src/                          # Source code
+│   ├── init.py                  #init
 │   ├── detection/               # Object detection modules
 │   │   ├── player_detector.py
 │   │   ├── ball_detector.py
