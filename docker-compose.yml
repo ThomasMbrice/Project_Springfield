@@ -1,0 +1,94 @@
+version: '3.8' # hopefuly this wont be a discrepnsy with 3.9
+
+services:
+  # dev enviroment in jlabs
+  basketball-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: springfield-dev
+    ports:
+      - "8888:8888"  # jlabs port
+      - "8080:8080"  # optional for the web
+    volumes:
+      # mount src for live deploy
+      - ./src:/app/src
+      - ./notebooks:/app/notebooks
+      - ./configs:/app/configs
+      # data directory
+      - ./data:/app/data
+      # pip package cache, lower startup time
+      - pip-cache:/root/.cache/pip
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - basketball-net
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+  # prod env
+  basketball-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: springfield-prod
+    volumes:
+      - ./data:/app/data:ro  # read only during production - prevent corruption
+      - ./models:/app/models
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/app
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - basketball-net
+    profiles:
+      - production  
+
+  # CPU-only version w/o GPU
+  basketball-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+      target: development
+    container_name: springfield-cpu
+    ports:
+      - "8889:8888"  # diff port to avoid thrashing
+    volumes:
+      - ./src:/app/src
+      - ./notebooks:/app/notebooks
+      - ./configs:/app/configs
+      - ./data:/app/data
+      - pip-cache:/root/.cache/pip
+    networks:
+      - basketball-net
+    profiles:
+      - cpu  # --profile cpu
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+networks:
+  basketball-net:
+    driver: bridge
+
+volumes:
+  pip-cache:
+    driver: local
